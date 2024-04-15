@@ -1,4 +1,4 @@
-var budget = [
+const budget = [
   { value: 250, description: 'Sold old TV 📺', user: 'jonas' },
   { value: -45, description: 'Groceries 🥑', user: 'jonas' },
   { value: 3500, description: 'Monthly salary 👩‍💻', user: 'jonas' },
@@ -9,56 +9,55 @@ var budget = [
   { value: -1800, description: 'New Laptop 💻', user: 'jonas' },
 ];
 
-var limits = {
+const spendingLimits = {
   jonas: 1500,
   matilda: 100,
 };
 
-var add = function (value, description, user) {
-  if (!user) user = 'jonas';
-  user = user.toLowerCase();
+const getLimit = (limits, user) => limits?.[user] ?? 0;
 
-  var lim;
-  if (limits[user]) {
-    lim = limits[user];
-  } else {
-    lim = 0;
-  }
-
-  if (value <= lim) {
-    budget.push({ value: -value, description: description, user: user });
-  }
+// Pure funciton :D
+const addExpense = function (
+  state,
+  limits,
+  value,
+  description,
+  user = 'jonas'
+) {
+  const cleanUser = user.toLowerCase(); 
+  return value <= getLimit(limits, cleanUser) ? [...state, { value: -value, description, cleanUser }] : state;
 };
-add(10, 'Pizza 🍕');
-add(100, 'Going to movies 🍿', 'Matilda');
-add(200, 'Stuff', 'Jay');
-console.log(budget);
 
-var check = function () {
-  for (var el of budget) {
-    var lim;
-    if (limits[el.user]) {
-      lim = limits[el.user];
-    } else {
-      lim = 0;
-    }
+const newBudget1 = addExpense(budget, spendingLimits, 10, 'Pizza 🍕');
+console.log('aver newBudget1 ', newBudget1);
 
-    if (el.value < -lim) {
-      el.flag = 'limit';
-    }
-  }
+const newBudget2 = addExpense(newBudget1, spendingLimits, 100, 'Going to movies 🍿', 'Matilda');
+console.log('aver newBudget2 ', newBudget2);
+
+const newBudget3 = addExpense(newBudget2, spendingLimits, 200, 'Stuff', 'Jay');
+
+
+
+const checkExpenses = function (state, limits, ) {
+  return state.map(entry => {
+    return entry.value < -getLimit(limits, entry.user) ? {...entry, flag: 'limit'} : entry;
+  }) 
+  // for (const entry of budget)
+  //   if (entry.value < -getLimit(limit, entry.user)) entry.flag = 'limit';
 };
-check();
+const finalBudget = checkExpenses(newBudget3, spendingLimits);
+console.log('aver finalBudget ', finalBudget);
 
-console.log(budget);
+const logBigExpenses = function (state, bigLimit) {
+  // let output = '';
+  // for (const entry of budget) {
+  //   output += entry.value <= -bigLimit ? `${entry.description.slice(-2)} / ` : '';
+  // }
+  // output = output.slice(0, -2); // Remove last '/ '
+  // console.log(output);
 
-var bigExpenses = function (limit) {
-  var output = '';
-  for (var el of budget) {
-    if (el.value <= -limit) {
-      output += el.description.slice(-2) + ' / '; // Emojis are 2 chars
-    }
-  }
-  output = output.slice(0, -2); // Remove last '/ '
-  console.log(output);
+  const bigExpenses = state.filter(entry =>  entry.value <= -bigLimit).map(entry => entry.description.slice(-2)).join('/');
+  console.log('aver bigExpenses ', bigExpenses);
 };
+
+logBigExpenses(finalBudget, 100);

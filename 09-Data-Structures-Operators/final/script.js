@@ -102,6 +102,24 @@ Afterwards, test with your own test data!
 GOOD LUCK 😀
 */
 
+document.body.append(document.createElement('textarea'));
+document.body.append(document.createElement('button'));
+
+const textArea = document.querySelector('textarea');
+const applyButton = document.querySelector('button');
+applyButton.addEventListener('click', () => {
+  const lines = textArea.value.split('\n');
+  let result = '';
+  for (const [index, line] of lines.entries()) {
+    const [first, second] = line.split('_');
+    result += [first.toLowerCase() + second[0].toUpperCase() + second.slice(1).toLowerCase()].join('');
+    result += result.padEnd(20, ' ');
+    result += '✅'.repeat(index + 1);
+    result += '\n';
+  }
+  console.log(result);
+})
+
 /*
 document.body.append(document.createElement('textarea'));
 document.body.append(document.createElement('button'));
@@ -310,6 +328,11 @@ const gameEvents = new Map([
   [80, '⚽️ GOAL'],
   [92, '🔶 Yellow card'],
 ]);
+
+const events = [...new Set(gameEvents.values())];
+
+gameEvents.delete(64)
+
 
 /*
 // 1.
